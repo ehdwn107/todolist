@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
-import api from "../api";
 import AddTodo from "../components/AddTodo";
 import TodoItem from "../components/TodoItem";
 
@@ -12,55 +10,57 @@ const FILTERS = [
   { label: "완료", emoji: "✨" },
 ];
 
+function loadTodos() {
+  try {
+    return JSON.parse(localStorage.getItem("todos") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveTodos(todos) {
+  localStorage.setItem("todos", JSON.stringify(todos));
+}
+
 export default function Home() {
-  const navigate = useNavigate();
-  const [todos, setTodos] = useState([]);
-  const [user, setUser] = useState(null);
+  const [todos, setTodos] = useState(loadTodos);
   const [filter, setFilter] = useState("전체");
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
-    api.get("/auth/me").then(({ data }) => setUser(data)).catch(() => navigate("/login"));
-    fetchTodos();
-  }, []);
+    saveTodos(todos);
+  }, [todos]);
 
-  const fetchTodos = async () => {
-    const { data } = await api.get("/todos");
-    setTodos(data);
+  const handleAdd = ({ title, priority, due_date }) => {
+    const newTodo = {
+      id: Date.now(),
+      title,
+      priority,
+      due_date,
+      completed: false,
+      created_at: new Date().toISOString(),
+      order: todos.length,
+    };
+    setTodos((prev) => [...prev, newTodo]);
   };
 
-  const handleAdd = async (body) => {
-    const { data } = await api.post("/todos", body);
-    setTodos((prev) => [...prev, data]);
+  const handleToggle = (id) => {
+    setTodos((prev) => prev.map((t) => t.id === id ? { ...t, completed: !t.completed } : t));
   };
 
-  const handleToggle = async (id) => {
-    const { data } = await api.patch(`/todos/${id}/done`);
-    setTodos((prev) => prev.map((t) => (t.id === id ? data : t)));
-  };
-
-  const handleDelete = async (id) => {
-    await api.delete(`/todos/${id}`);
+  const handleDelete = (id) => {
     setTodos((prev) => prev.filter((t) => t.id !== id));
   };
 
-  const handleUpdate = async (id, body) => {
-    const { data } = await api.put(`/todos/${id}`, body);
-    setTodos((prev) => prev.map((t) => (t.id === id ? data : t)));
+  const handleUpdate = (id, body) => {
+    setTodos((prev) => prev.map((t) => t.id === id ? { ...t, ...body } : t));
   };
 
-  const handleDragEnd = async ({ active, over }) => {
+  const handleDragEnd = ({ active, over }) => {
     if (!over || active.id === over.id) return;
     const oldIndex = todos.findIndex((t) => t.id === active.id);
     const newIndex = todos.findIndex((t) => t.id === over.id);
-    const reordered = arrayMove(todos, oldIndex, newIndex);
-    setTodos(reordered);
-    await Promise.all(reordered.map((t, i) => api.put(`/todos/${t.id}`, { order: i })));
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+    setTodos(arrayMove(todos, oldIndex, newIndex));
   };
 
   const filtered = todos.filter((t) => {
@@ -74,22 +74,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(135deg, #fdf4ff 0%, #fce7f3 50%, #ede9fe 100%)" }}>
-      {/* 헤더 */}
       <header className="bg-white bg-opacity-80 backdrop-blur px-6 py-4 flex items-center justify-between sticky top-0 z-10" style={{ borderBottom: "2px solid #f3e8ff" }}>
         <div className="flex items-center gap-2">
           <span className="text-2xl">🌸</span>
           <h1 className="text-xl font-extrabold" style={{ color: "#a855f7" }}>Todo 리스트</h1>
         </div>
-        <div className="flex items-center gap-4">
-          {user && (
-            <span className="text-sm font-bold px-3 py-1 rounded-full" style={{ background: "#f3e8ff", color: "#a855f7" }}>
-              🐣 {user.username}
-            </span>
-          )}
-          <button onClick={logout} className="text-sm font-bold px-3 py-1 rounded-full transition hover:bg-red-50" style={{ color: "#f472b6" }}>
-            로그아웃
-          </button>
-        </div>
+        <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: "#f3e8ff", color: "#a855f7" }}>
+          💾 자동 저장
+        </span>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-5">
