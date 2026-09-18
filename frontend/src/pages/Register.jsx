@@ -23,56 +23,71 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">✅ 회원가입</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
-            <input
-              type="text"
-              required
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="홍길동"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
-            <input
-              type="email"
-              required
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="example@email.com"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
-            <input
-              type="password"
-              required
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••"
-            />
-          </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
-          >
-            {loading ? "가입 중..." : "회원가입"}
-          </button>
-        </form>
-        <p className="text-center text-sm text-gray-500 mt-4">
-          이미 계정이 있으신가요?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline">로그인</Link>
-        </p>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, #fdf4ff 0%, #fce7f3 50%, #ede9fe 100%)" }}>
+      <div className="w-full max-w-md px-4">
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-3">🌷</div>
+          <h1 className="text-3xl font-extrabold" style={{ color: "#a855f7" }}>회원가입</h1>
+          <p className="text-pink-400 text-sm mt-1 font-semibold">함께 할 일을 관리해봐요!</p>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-xl p-8" style={{ border: "2px solid #f3e8ff" }}>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: "#a855f7" }}>🌟 이름</label>
+              <input
+                type="text"
+                required
+                value={form.username}
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                className="w-full rounded-2xl px-4 py-3 text-sm outline-none transition font-semibold"
+                style={{ background: "#fdf4ff", border: "2px solid #e9d5ff", color: "#7c3aed" }}
+                placeholder="홍길동"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: "#a855f7" }}>📧 이메일</label>
+              <input
+                type="email"
+                required
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full rounded-2xl px-4 py-3 text-sm outline-none transition font-semibold"
+                style={{ background: "#fdf4ff", border: "2px solid #e9d5ff", color: "#7c3aed" }}
+                placeholder="example@email.com"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: "#a855f7" }}>🔒 비밀번호</label>
+              <input
+                type="password"
+                required
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                className="w-full rounded-2xl px-4 py-3 text-sm outline-none transition font-semibold"
+                style={{ background: "#fdf4ff", border: "2px solid #e9d5ff", color: "#7c3aed" }}
+                placeholder="••••••••"
+              />
+            </div>
+            {error && (
+              <div className="bg-red-50 rounded-2xl px-4 py-3 text-red-500 text-sm font-semibold text-center">
+                😢 {error}
+              </div>
+            )}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-2xl font-extrabold text-white text-sm transition disabled:opacity-60"
+              style={{ background: "linear-gradient(135deg, #c084fc, #f472b6)" }}
+            >
+              {loading ? "가입 중... 🌀" : "회원가입 🎉"}
+            </button>
+          </form>
+          <p className="text-center text-sm mt-5" style={{ color: "#c084fc" }}>
+            이미 계정이 있으신가요?{" "}
+            <Link to="/login" className="font-extrabold hover:underline" style={{ color: "#a855f7" }}>로그인</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -6,7 +6,11 @@ import api from "../api";
 import AddTodo from "../components/AddTodo";
 import TodoItem from "../components/TodoItem";
 
-const FILTERS = ["전체", "진행중", "완료"];
+const FILTERS = [
+  { label: "전체", emoji: "🌈" },
+  { label: "진행중", emoji: "🔥" },
+  { label: "완료", emoji: "✨" },
+];
 
 export default function Home() {
   const navigate = useNavigate();
@@ -66,45 +70,80 @@ export default function Home() {
   });
 
   const done = todos.filter((t) => t.completed).length;
+  const progress = todos.length > 0 ? Math.round((done / todos.length) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-800">✅ TodoList</h1>
+    <div className="min-h-screen" style={{ background: "linear-gradient(135deg, #fdf4ff 0%, #fce7f3 50%, #ede9fe 100%)" }}>
+      {/* 헤더 */}
+      <header className="bg-white bg-opacity-80 backdrop-blur px-6 py-4 flex items-center justify-between sticky top-0 z-10" style={{ borderBottom: "2px solid #f3e8ff" }}>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">🌸</span>
+          <h1 className="text-xl font-extrabold" style={{ color: "#a855f7" }}>Todo 리스트</h1>
+        </div>
         <div className="flex items-center gap-4">
-          {user && <span className="text-sm text-gray-600">👋 {user.username}</span>}
-          <button onClick={logout} className="text-sm text-gray-500 hover:text-red-500 transition">로그아웃</button>
+          {user && (
+            <span className="text-sm font-bold px-3 py-1 rounded-full" style={{ background: "#f3e8ff", color: "#a855f7" }}>
+              🐣 {user.username}
+            </span>
+          )}
+          <button onClick={logout} className="text-sm font-bold px-3 py-1 rounded-full transition hover:bg-red-50" style={{ color: "#f472b6" }}>
+            로그아웃
+          </button>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-500">
-            전체 <strong className="text-gray-800">{todos.length}</strong>개 · 완료{" "}
-            <strong className="text-blue-600">{done}</strong>개
+      <main className="max-w-2xl mx-auto px-4 py-8 space-y-5">
+        {/* 진행률 카드 */}
+        <div className="bg-white rounded-3xl p-5 shadow-md" style={{ border: "2px solid #f3e8ff" }}>
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-xs font-bold" style={{ color: "#c084fc" }}>오늘의 달성률</p>
+              <p className="text-3xl font-extrabold" style={{ color: "#a855f7" }}>{progress}%</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-bold" style={{ color: "#c084fc" }}>전체 {todos.length}개</p>
+              <p className="text-xs font-bold" style={{ color: "#f472b6" }}>완료 {done}개 🎀</p>
+            </div>
           </div>
-          <div className="flex gap-1">
-            {FILTERS.map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-3 py-1 rounded-full text-sm font-medium transition ${
-                  filter === f ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
-                }`}
-              >
-                {f}
-              </button>
-            ))}
+          <div className="w-full rounded-full h-3" style={{ background: "#f3e8ff" }}>
+            <div
+              className="h-3 rounded-full transition-all duration-500"
+              style={{ width: `${progress}%`, background: "linear-gradient(90deg, #c084fc, #f472b6)" }}
+            />
           </div>
         </div>
 
+        {/* 필터 */}
+        <div className="flex gap-2">
+          {FILTERS.map(({ label, emoji }) => (
+            <button
+              key={label}
+              onClick={() => setFilter(label)}
+              className="flex-1 py-2 rounded-2xl text-sm font-extrabold transition"
+              style={
+                filter === label
+                  ? { background: "linear-gradient(135deg, #c084fc, #f472b6)", color: "white", boxShadow: "0 4px 15px rgba(192,132,252,0.4)" }
+                  : { background: "white", color: "#c084fc", border: "2px solid #f3e8ff" }
+              }
+            >
+              {emoji} {label}
+            </button>
+          ))}
+        </div>
+
+        {/* 추가 폼 */}
         <AddTodo onAdd={handleAdd} />
 
+        {/* 목록 */}
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={filtered.map((t) => t.id)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {filtered.length === 0 && (
-                <p className="text-center text-gray-400 py-12">할 일이 없습니다 🎉</p>
+                <div className="text-center py-16">
+                  <div className="text-5xl mb-3">🎉</div>
+                  <p className="font-bold" style={{ color: "#c084fc" }}>할 일이 없어요!</p>
+                  <p className="text-sm mt-1" style={{ color: "#d8b4fe" }}>새로운 할 일을 추가해보세요</p>
+                </div>
               )}
               {filtered.map((todo) => (
                 <TodoItem
